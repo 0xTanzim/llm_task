@@ -1,19 +1,17 @@
 """
-LLM Service Layer - Clean separation of concerns
-All LLM operations go here, no business logic in routes
+LLM Service: LLM operations only
 """
-from typing import AsyncGenerator
+from typing import AsyncGenerator, List
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import BaseMessage
 
 from core.config import settings
 
-
-# Single LLM instance
 _llm = None
 
 
 def get_llm() -> ChatOpenAI:
-    """Get or create LLM instance."""
+    """Get singleton LLM instance."""
     global _llm
     if _llm is None:
         _llm = ChatOpenAI(
@@ -26,19 +24,16 @@ def get_llm() -> ChatOpenAI:
     return _llm
 
 
-async def stream_response(prompt: str) -> AsyncGenerator[str, None]:
-    """
-    Stream response token by token.
-    Used by all endpoints that need streaming.
-    """
+async def stream_chat(messages: List[BaseMessage]) -> AsyncGenerator[str, None]:
+    """Stream response from messages."""
     llm = get_llm()
-    async for chunk in llm.astream([{"role": "user", "content": prompt}]):
+    async for chunk in llm.astream(messages):
         if chunk.content:
             yield chunk.content
 
 
-async def get_response(prompt: str) -> str:
-    """Get complete response without streaming."""
+async def invoke_chat(messages: List[BaseMessage]) -> str:
+    """Get complete response from messages."""
     llm = get_llm()
-    response = await llm.ainvoke([{"role": "user", "content": prompt}])
+    response = await llm.ainvoke(messages)
     return response.content

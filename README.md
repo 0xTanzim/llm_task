@@ -47,39 +47,40 @@ Access: http://localhost:8000/docs
 
 ## 📡 API Endpoints
 
-### 1️⃣ Chat (Simple & Streaming)
+### 1️⃣ Chat with Conversation Memory
 ```bash
-# Regular chat
+# Start a conversation (creates session automatically)
 curl -X POST "http://localhost:8000/api/chat/" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello!", "stream": false}'
+  -d '{"message": "Hi, I am Alice", "stream": false, "session_id": "alice_session"}'
 
-# Streaming (use -N flag!)
-curl -N -X POST "http://localhost:8000/api/chat/" \
+# Response with context memory
+curl -X POST "http://localhost:8000/api/chat/" \
   -H "Content-Type: application/json" \
-  -d '{"message": "Count to 5", "stream": true}'
+  -d '{"message": "What is my name?", "stream": false, "session_id": "alice_session"}'
 ```
 
-### 2️⃣ Chain-of-Thought Reasoning
+### 2️⃣ Chain-of-Thought Reasoning with Memory
 ```bash
-# Streaming
-curl -N -X POST "http://localhost:8000/api/chat/reason" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "What is 2 + 3 * 5?", "stream": true}'
-
-# JSON response
+# Reasoning with conversation history
 curl -X POST "http://localhost:8000/api/chat/reason" \
   -H "Content-Type: application/json" \
-  -d '{"query": "Solve x^2 - 5x + 6 = 0", "stream": false}'
+  -d '{"query": "What is 2 + 3 * 5?", "stream": false, "session_id": "user123"}'
+
+# AI remembers previous queries in same session
+curl -X POST "http://localhost:8000/api/chat/reason" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What was the previous answer?", "stream": false, "session_id": "user123"}'
 ```
 
-Returns structured JSON:
-```json
-{
-  "thinking": "reasoning steps...",
-  "steps": ["step1", "step2"],
-  "answer": "final answer"
-}
+### 3️⃣ View Conversation History
+```bash
+curl http://localhost:8000/api/chat/history/alice_session
+```
+
+### 4️⃣ Clear Session History
+```bash
+curl -X DELETE http://localhost:8000/api/chat/history/alice_session
 ```
 
 ### Health Check
@@ -141,6 +142,8 @@ async function streamChat(message) {
 ✅ Async Programming  
 ✅ Data Streaming (SSE)  
 ✅ LangChain Integration  
+✅ **Conversation Memory** (Session Management)  
+✅ **Prompt Templates** (ChatPromptTemplate)  
 ✅ Type Safety (Pydantic)  
 ✅ Environment Config  
 ✅ Chain-of-Thought Reasoning
