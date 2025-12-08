@@ -1,33 +1,31 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import router as api_router
-from core.config import settings
 
-app = FastAPI(title="FastAPI LangChain Service")
+from config import settings
 
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Routes
-app.include_router(api_router, prefix="/api")
+def create_app() -> FastAPI:
+    app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "FastAPI + LangChain", "docs": "/docs"}
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/")
+    async def root():
+        return {"message": "FastAPI + LangChain", "docs": "/docs"}
+
+    return app
 
 
-@app.on_event("startup")
-async def startup():
-    print(f"🚀 Server started | Model: {settings.LLM_MODEL}")
-    print(f"🔑 API Key loaded: {'Yes' if settings.GOOGLE_API_KEY else 'No'}")
+app = create_app()
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
