@@ -14,7 +14,7 @@ class AgentState(TypedDict):
     errors: List[str]
 
 
-DB_KEYWORDS = {"database", "sql", "data", "schema", "query", "postgres", "mysql"}
+DB_KEYWORDS = {"database", "sql", "data", "schema", "query", "postgres", "mysql", "table", "db"}
 CODE_KEYWORDS = {
     "code",
     "bug",
@@ -24,9 +24,10 @@ CODE_KEYWORDS = {
     "class",
     "python",
     "typescript",
+    "debug",
 }
 
-MAX_LLM_CALLS = 6
+MAX_LLM_CALLS = 8
 
 
 def message_text(message: Any) -> str:

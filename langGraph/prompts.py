@@ -124,7 +124,7 @@ def dynamic_template_selector(user_input: str) -> ChatPromptTemplate:
         return CODE_PROMPT
     elif any(
         word in user_input_lower
-        for word in ["database", "sql", "query", "data", "table", "schema"]
+        for word in ["database", "sql", "data", "schema", "query", "postgres", "mysql", "table", "db"]
     ):
         return DATABASE_PROMPT
     else:
