@@ -41,18 +41,18 @@ def query_database(sql_query: str) -> str:
         sql = (sql_query or "").strip()
         sql_lower = sql.lower()
 
-        # safety guardrail: allow read-only queries only.
-        disallowed = (
-            "drop ",
-            "delete ",
-            "truncate ",
-            "alter ",
-            "update ",
-            "insert ",
-            "create ",
-        )
-        if any(tok in sql_lower for tok in disallowed):
-            return "❌ Unsafe SQL blocked. Only read-only queries are allowed (SELECT/WITH/EXPLAIN)."
+        # # safety guardrail: allow read-only queries only.
+        # disallowed = (
+        #     "drop ",
+        #     "delete ",
+        #     "truncate ",
+        #     "alter ",
+        #     "update ",
+        #     "insert ",
+        #     "create ",
+        # )
+        # if any(tok in sql_lower for tok in disallowed):
+        #     return "❌ Unsafe SQL blocked. Only read-only queries are allowed (SELECT/WITH/EXPLAIN)."
 
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)

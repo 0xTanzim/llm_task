@@ -5,8 +5,8 @@ from langchain_core.messages import AIMessage, HumanMessage
 def main():
     # Test with different queries
     test_queries = [
-        "What is the latest in artificial intelligence?",
-        "Write a Python function that sums even numbers",
+        # "What is the latest in artificial intelligence?",
+        # "Write a Python function that sums even numbers",
         "Give me the highest ordered products from the database",
     ]
 
@@ -24,7 +24,8 @@ def main():
                 "selected_tools": [],
                 "llm_calls": 0,
                 "errors": [],
-            }
+            },
+              {"configurable": {"thread_id": "1"}},  
         )
 
         print("\n" + "=" * 50)

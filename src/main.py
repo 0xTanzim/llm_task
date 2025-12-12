@@ -1,4 +1,3 @@
-
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -11,11 +10,22 @@ from config import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager."""
-    print(f"Starting {settings.APP_NAME}...")
-    print(f"LLM Model: {settings.LLM_MODEL}")
-    print(f"API Docs: http://{settings.HOST}:{settings.PORT}/docs")
-    yield
-    print("Shutting down...")
+    try:
+        print(f"Starting {getattr(settings, 'APP_NAME', 'Unknown App')}...")
+        print(f"Default Model: {getattr(settings, 'DEFAULT_MODEL', 'Unknown')}")
+        db_url = getattr(settings, "DATABASE_URL", "Not configured")
+        print(f"Database: {db_url.split('@')[-1] if '@' in db_url else db_url}")
+        host = getattr(settings, "HOST", "0.0.0.0")
+        port = getattr(settings, "PORT", 8000)
+        print(f"API Docs: http://{host}:{port}/docs")
+        yield
+        print("Shutting down...")
+    except Exception as e:
+        print(f"❌ Lifespan error: {e}")
+        import traceback
+
+        traceback.print_exc()
+        raise
 
 
 def create_app() -> FastAPI:
@@ -24,6 +34,7 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI: Configured application instance
     """
+    print("Creating FastAPI app...")
     app = FastAPI(
         title="LangChain + LangGraph Agent API",
         description="agent with web search and calculation capabilities",
@@ -31,6 +42,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    print("Adding CORS middleware...")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
@@ -39,7 +51,10 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    print("Including chat router...")
     app.include_router(chat_router)
+
+    print("Adding root endpoint...")
 
     @app.get("/")
     async def root():
@@ -51,15 +66,22 @@ def create_app() -> FastAPI:
             "health": "/health",
         }
 
+    print("Adding health endpoint...")
+
     @app.get("/health")
     async def health():
         """Health check endpoint."""
         return {
             "status": "healthy",
-            "model": settings.LLM_MODEL,
-            "base_url": settings.OPENAI_BASE_URL,
+            "default_model": getattr(settings, "DEFAULT_MODEL", "Unknown"),
+            "database_url": (
+                getattr(settings, "DATABASE_URL", "Not configured").split("@")[-1]
+                if getattr(settings, "DATABASE_URL", None)
+                else "not configured"
+            ),
         }
 
+    print("✅ App created successfully!")
     return app
 
 

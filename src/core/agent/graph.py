@@ -1,6 +1,8 @@
-from __future__ import annotations
+"""LangGraph graph creation and compilation."""
 
-from graph_nodes import (
+from langgraph.graph import END, START, StateGraph
+
+from core.agent.nodes import (
     call_model_node,
     execute_tools_node,
     input_route,
@@ -11,12 +13,25 @@ from graph_nodes import (
     validate_final_answer_node,
     validate_input_node,
 )
-from graph_state import AgentState
-from langgraph.graph import END, START, StateGraph
-from langgraph.checkpoint.memory import MemorySaver
+from core.agent.state import AgentState
 
 
-def create_app():
+def create_graph(checkpointer=None):
+    """
+    Create and compile the LangGraph ReAct agent workflow.
+
+    Args:
+        checkpointer: Optional checkpointer for state persistence (e.g., PostgresSaver)
+
+    Returns:
+        Compiled StateGraph ready for invocation
+
+    Graph flow:
+        START → validate_input → [invalid_input | route_request]
+        route_request → call_model → [tools | finalize | maxed_out]
+        tools → call_model (loop)
+        [invalid_input | maxed_out | finalize] → validate_final → END
+    """
     workflow = StateGraph(AgentState)
 
     workflow.add_node("validate_input", validate_input_node)
@@ -55,6 +70,4 @@ def create_app():
     workflow.add_edge("maxed_out", "validate_final")
     workflow.add_edge("validate_final", END)
 
-    memory = MemorySaver()
-
-    return workflow.compile(checkpointer=memory)
+    return workflow.compile(checkpointer=checkpointer)

@@ -30,6 +30,7 @@ openai_model = ChatOpenAI(
     model="openai/gpt-4o-mini",
     api_key=api_key,
     base_url=base_url,
+    
 )
 
 default_model = gemini_model
