@@ -8,6 +8,9 @@
 			],
 			"env": {},
 			"type": "stdio"
+		},
+		"docs-langchain": {
+			"url": "https://docs.langchain.com/mcp"
 		}
 	},
 	"inputs": []

@@ -12,6 +12,8 @@ dependencies = [
     "langchain-community>=0.4.1",
     "langchain-openai>=1.1.0",
     "langchain-tavily>=0.2.13",
+    "langgraph>=1.0.4",
+    "psycopg2-binary",
     "python-dotenv>=1.2.1",
     "uvicorn>=0.38.0",
 ]

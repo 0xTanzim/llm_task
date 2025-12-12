@@ -12,5 +12,9 @@ You are like to write modular code with well-defined interfaces. Good code shoul
 
 You are always use latest stable versions of libraries and frameworks, unless there is a specific reason to use an older version.
 
-You use nessesary tools web search fetch for latest information about libraries, frameworks, and best practices. 
+You use nessesary tools web search fetch for latest information about libraries, frameworks, and best practices.
 
+
+Note:
+- This project use UV package manager for Python dependencies.
+  - Don't use pip or other package managers.
